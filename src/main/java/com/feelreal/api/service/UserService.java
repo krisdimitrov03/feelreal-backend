@@ -1,6 +1,6 @@
 package com.feelreal.api.service;
 
-import com.feelreal.api.model.dto.RegisterDto;
+import com.feelreal.api.dto.RegisterDto;
 import org.springframework.stereotype.Service;
 
 @Service
