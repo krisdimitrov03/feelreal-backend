@@ -10,8 +10,8 @@ import java.util.UUID;
 @Data
 @Table(name = "jobs")
 public class Job {
+
     @Id
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
@@ -20,6 +20,7 @@ public class Job {
 
     @Column(name = "intensity", nullable = false)
     private Intensity intensity;
+
 }
 
 

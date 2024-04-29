@@ -1,10 +1,10 @@
 package com.feelreal.api.model;
 
+import com.feelreal.api.model.enumeration.RepeatMode;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.sql.Time;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -22,22 +22,14 @@ public class Event {
     @Column(name = "notes", nullable = false)
     private String notes;
 
-    @Column(name = "date", nullable = false)
-    private LocalDate date;
+    @Column(name = "date_time_start", nullable = false)
+    private LocalDateTime dateTimeStart;
 
-    @Column(name = "time_start", nullable = false)
-    private Time timeStart;
+    @Column(name = "date_time_end", nullable = false)
+    private LocalDateTime dateTimeEnd;
 
-    @Column(name = "time_end", nullable = false)
-    private Time timeEnd;
-
-    @ManyToOne
-    @JoinColumn(name = "repeat_mode_id")
+    @Column(name = "repeat_mode", nullable = false)
     private RepeatMode repeatMode;
-
-    @ManyToOne
-    @JoinColumn(name = "color_id")
-    private Color color;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

@@ -10,8 +10,8 @@ import java.util.UUID;
 @Data
 @Table(name = "users")
 public class User {
+
     @Id
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
@@ -36,4 +36,5 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "job_id")
     private Job job;
+
 }
