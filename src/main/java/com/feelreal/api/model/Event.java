@@ -2,7 +2,9 @@ package com.feelreal.api.model;
 
 import com.feelreal.api.model.enumeration.RepeatMode;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -16,23 +18,31 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "title")
+    @NotNull
+    @Length(min = 3, max = 64, message = "Title must be between 3 and 64 characters")
     private String title;
 
-    @Column(name = "notes", nullable = false)
+    @Column(name = "notes")
+    @NotNull
+    @Length(max = 500, message = "Notes must be less than or equal to 500 characters")
     private String notes;
 
-    @Column(name = "date_time_start", nullable = false)
+    @Column(name = "date_time_start")
+    @NotNull
     private LocalDateTime dateTimeStart;
 
-    @Column(name = "date_time_end", nullable = false)
+    @Column(name = "date_time_end")
+    @NotNull
     private LocalDateTime dateTimeEnd;
 
-    @Column(name = "repeat_mode", nullable = false)
+    @Column(name = "repeat_mode")
+    @NotNull
     private RepeatMode repeatMode;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @NotNull
     private User user;
     
 }
