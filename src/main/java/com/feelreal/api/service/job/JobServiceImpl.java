@@ -1,4 +1,4 @@
-package com.feelreal.api.service;
+package com.feelreal.api.service.job;
 
 import com.feelreal.api.model.Job;
 import com.feelreal.api.repository.JobRepository;

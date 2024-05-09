@@ -1,4 +1,4 @@
-package com.feelreal.api.dto;
+package com.feelreal.api.dto.authentication;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

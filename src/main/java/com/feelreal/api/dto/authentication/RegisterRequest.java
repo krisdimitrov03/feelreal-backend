@@ -1,4 +1,4 @@
-package com.feelreal.api.dto;
+package com.feelreal.api.dto.authentication;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -8,7 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.util.UUID;
 
 @Data
-public class RegisterDto {
+public class RegisterRequest {
 
     @NotNull
     private String username;

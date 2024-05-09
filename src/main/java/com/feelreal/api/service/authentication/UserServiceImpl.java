@@ -1,14 +1,14 @@
-package com.feelreal.api.service;
+package com.feelreal.api.service.authentication;
 
-import com.feelreal.api.config.JwtService;
-import com.feelreal.api.dto.LoginDto;
-import com.feelreal.api.dto.RegisterResponse;
-import com.feelreal.api.dto.TokenData;
+import com.feelreal.api.dto.authentication.LoginRequest;
+import com.feelreal.api.dto.authentication.RegisterResponse;
+import com.feelreal.api.dto.authentication.TokenData;
 import com.feelreal.api.model.Job;
 import com.feelreal.api.model.User;
-import com.feelreal.api.dto.RegisterDto;
+import com.feelreal.api.dto.authentication.RegisterRequest;
 import com.feelreal.api.model.enumeration.Role;
 import com.feelreal.api.repository.UserRepository;
+import com.feelreal.api.service.job.JobService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public RegisterResponse register(RegisterDto data) {
+    public RegisterResponse register(RegisterRequest data) {
         boolean userExists = repo
                 .findByUsername(data.getUsername())
                 .isPresent();
@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<String> login(LoginDto data) {
+    public Optional<String> login(LoginRequest data) {
         Optional<User> userOpt = repo.findByUsername(data.getUsername());
 
         if (userOpt.isEmpty()) {
@@ -95,7 +95,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
-    private User createUserEntity(RegisterDto data, Job job) {
+    private User createUserEntity(RegisterRequest data, Job job) {
         return new User(
                 data.getUsername(),
                 data.getEmail(),

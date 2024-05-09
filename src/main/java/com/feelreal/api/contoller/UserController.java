@@ -1,10 +1,10 @@
 package com.feelreal.api.contoller;
 
-import com.feelreal.api.dto.LoginDto;
-import com.feelreal.api.dto.LoginResultDto;
-import com.feelreal.api.dto.RegisterDto;
-import com.feelreal.api.dto.RegisterResponse;
-import com.feelreal.api.service.UserService;
+import com.feelreal.api.dto.authentication.LoginRequest;
+import com.feelreal.api.dto.authentication.LoginResponse;
+import com.feelreal.api.dto.authentication.RegisterRequest;
+import com.feelreal.api.dto.authentication.RegisterResponse;
+import com.feelreal.api.service.authentication.UserService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,7 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(
-            @RequestBody @Valid RegisterDto data,
+            @RequestBody @Valid RegisterRequest data,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
@@ -54,14 +54,14 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResultDto> login(@RequestBody LoginDto data) {
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest data) {
 
         return userService
                 .login(data).map(s -> {
                             logger.atInfo().log("User logged in: {}", data.getUsername());
-                            return ResponseEntity.ok().body(new LoginResultDto(true, s));
+                            return ResponseEntity.ok().body(new LoginResponse(true, s));
                         }
-                ).orElseGet(() -> ResponseEntity.ok().body(new LoginResultDto(false, null)));
+                ).orElseGet(() -> ResponseEntity.ok().body(new LoginResponse(false, null)));
 
     }
 }

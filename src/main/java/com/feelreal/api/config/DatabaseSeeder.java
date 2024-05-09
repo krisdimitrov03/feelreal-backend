@@ -6,7 +6,6 @@ import com.feelreal.api.model.enumeration.Intensity;
 import com.feelreal.api.model.enumeration.Role;
 import com.feelreal.api.repository.JobRepository;
 import com.feelreal.api.repository.UserRepository;
-import com.feelreal.api.util.PasswordHasher;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;

@@ -1,10 +1,11 @@
-package com.feelreal.api.config;
+package com.feelreal.api.service.authentication;
 
-import com.feelreal.api.dto.TokenData;
+import com.feelreal.api.dto.authentication.TokenData;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -14,7 +15,8 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY = "WVAI2eAg1ranDyur6gRNkxeVoD5UHQUAwHawujjtC9XNBkyFooUpIYSNqghHXf8hOicJTWGQHWGqoWCFxrBDvtaU2OTKyaQ1977DvK5lVPLxfHzHStm/1BSFbRW3XQ9zwhcS3mWWmRgWjvooMyFSe8oxTr9iOHN6tHsV5SRIHfD8hhkWoDvVSulB/0cry4HGegWwDdsMuO+jwm5N7CYwYYRGi+8gVVpwm0kegB5+opbgul4kQycmVkuwd4agWIU8zqI49cpuPgB3S2yBbrp/3tOCbuSogPh7xzk6FgoZArBY90QLaXoHJoK/CFysGH8XwyjSOAQTsEb0n62llESBWw==";
+    @Value("${jwt.secret-key}")
+    private String SECRET_KEY;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
