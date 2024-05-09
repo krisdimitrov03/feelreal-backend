@@ -1,7 +1,7 @@
 package com.feelreal.api.contoller;
 
 import com.feelreal.api.dto.RegisterDto;
-import com.feelreal.api.service.UserService;
+import com.feelreal.api.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
