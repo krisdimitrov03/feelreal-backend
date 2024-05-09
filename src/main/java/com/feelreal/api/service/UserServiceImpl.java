@@ -9,7 +9,6 @@ import com.feelreal.api.model.User;
 import com.feelreal.api.dto.RegisterDto;
 import com.feelreal.api.model.enumeration.Role;
 import com.feelreal.api.repository.UserRepository;
-import com.feelreal.api.util.PasswordHasher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,18 +26,18 @@ public class UserServiceImpl implements UserService {
     private final UserRepository repo;
     private final JwtService jwtService;
     private final JobService jobService;
-    private final PasswordHasher passwordHasher;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserServiceImpl(
             UserRepository repo,
             JwtService jwtService,
             JobService jobService,
-            PasswordHasher passwordHasher) {
+            PasswordEncoder passwordEncoder) {
         this.repo = repo;
         this.jwtService = jwtService;
         this.jobService = jobService;
-        this.passwordHasher = passwordHasher;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -75,9 +74,7 @@ public class UserServiceImpl implements UserService {
             return Optional.empty();
         }
 
-        String inputPasswordHash = passwordHasher.hash(data.getPassword());
-
-        if (!userOpt.get().getPasswordHash().equals(inputPasswordHash)) {
+        if (!passwordEncoder.matches(data.getPassword(), userOpt.get().getPassword())) {
             return Optional.empty();
         }
 
@@ -93,11 +90,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean logout(String token) {
-        return false;
-    }
-
-    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return repo.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -109,7 +101,7 @@ public class UserServiceImpl implements UserService {
                 data.getEmail(),
                 data.getFirstName(),
                 data.getLastName(),
-                passwordHasher.hash(data.getPassword()),
+                passwordEncoder.encode(data.getPassword()),
                 LocalDate.parse(data.getDateOfBirth()),
                 Role.USER,
                 job,

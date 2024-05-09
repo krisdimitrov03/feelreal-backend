@@ -6,6 +6,8 @@ import com.feelreal.api.dto.RegisterDto;
 import com.feelreal.api.dto.RegisterResponse;
 import com.feelreal.api.service.UserService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.ResponseEntity;
@@ -16,14 +18,15 @@ import java.util.Collections;
 import java.util.List;
 
 @RestController()
-@RequestMapping("/api/user")
-@CrossOrigin
+@RequestMapping("/user")
 public class UserController {
     private final UserService userService;
+    private final Logger logger;
 
     @Autowired
     public UserController(UserService service) {
         userService = service;
+        logger = LoggerFactory.getLogger(UserController.class);
     }
 
     @PostMapping("/register")
@@ -42,6 +45,8 @@ public class UserController {
         RegisterResponse response = userService.register(data);
 
         if (response.isSuccessful()) {
+            logger.atInfo().log("User registered: {}", data.getUsername());
+
             return ResponseEntity.ok().body(new RegisterResponse(true, Collections.emptyList()));
         }
 
@@ -52,11 +57,11 @@ public class UserController {
     public ResponseEntity<LoginResultDto> login(@RequestBody LoginDto data) {
 
         return userService
-                .login(data).map(s ->
-                        ResponseEntity.ok().body(new LoginResultDto(true, s))
-                ).orElseGet(() ->
-                        ResponseEntity.ok().body(new LoginResultDto(false, null))
-                );
+                .login(data).map(s -> {
+                            logger.atInfo().log("User logged in: {}", data.getUsername());
+                            return ResponseEntity.ok().body(new LoginResultDto(true, s));
+                        }
+                ).orElseGet(() -> ResponseEntity.ok().body(new LoginResultDto(false, null)));
 
     }
 }
