@@ -1,8 +1,7 @@
 package com.feelreal.api.contoller;
 
-import com.feelreal.api.model.User;
 import com.feelreal.api.service.ai.AISuggestionService;
-import com.feelreal.api.service.user.UserService;
+import com.feelreal.api.service.authentication.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
