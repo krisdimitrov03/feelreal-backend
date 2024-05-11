@@ -31,7 +31,7 @@ public class SecurityConfig {
                         .requestMatchers("/user/login").permitAll()
                         .requestMatchers("/user/register").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
+                        .anyRequest().anonymous()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
