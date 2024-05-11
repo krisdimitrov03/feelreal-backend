@@ -19,7 +19,11 @@ public class JwtService {
     private String SECRET_KEY;
 
     public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+        return extractClaim(token, t -> t.get("username", String.class));
+    }
+
+    public String extractId(String token) {
+        return extractClaim(token, t -> t.get("id", String.class));
     }
 
     public String generateToken(TokenData data) {
@@ -33,6 +37,17 @@ public class JwtService {
                 .claim("role", data.getRole())
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public boolean isValid(String token) {
+        // TODO: Implement token expiration check
+        // TODO: Implement token validity check
+
+        if (token == null || token.isEmpty()) {
+            return false;
+        }
+
+        return extractAllClaims(token) != null;
     }
 
     private Claims extractAllClaims(String token) {
