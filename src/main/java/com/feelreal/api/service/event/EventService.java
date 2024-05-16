@@ -12,7 +12,7 @@ import java.util.UUID;
 @Service
 public interface EventService {
 
-    OperationResult<UUID> create(EventCreateRequest data);
+    OperationResult<UUID> create(EventCreateRequest data, String token);
 
     OperationResult<Collection<Event>> getForUser(String token);
 

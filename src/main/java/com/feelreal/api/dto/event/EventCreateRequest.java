@@ -33,5 +33,4 @@ public class EventCreateRequest {
 
     @NotNull
     private String userId;
-
 }

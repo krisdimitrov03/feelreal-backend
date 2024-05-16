@@ -4,6 +4,7 @@ import com.feelreal.api.model.enumeration.RepeatMode;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.util.UUID;
 
 @Entity
 @Data
+@NoArgsConstructor
 @Table(name = "events")
 public class Event {
 
@@ -44,5 +46,21 @@ public class Event {
     @JoinColumn(name = "user_id")
     @NotNull
     private User user;
-    
+
+    public Event(
+            String title,
+            String notes,
+            LocalDateTime dateTimeStart,
+            LocalDateTime dateTimeEnd,
+            RepeatMode repeatMode,
+            User user
+    ) {
+        this.title = title;
+        this.notes = notes;
+        this.dateTimeStart = dateTimeStart;
+        this.dateTimeEnd = dateTimeEnd;
+        this.repeatMode = repeatMode;
+        this.user = user;
+    }
+
 }
