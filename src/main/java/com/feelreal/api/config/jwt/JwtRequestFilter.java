@@ -1,5 +1,6 @@
-package com.feelreal.api.config;
+package com.feelreal.api.config.jwt;
 
+import com.feelreal.api.model.User;
 import com.feelreal.api.service.authentication.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -39,8 +40,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
             if (jwtService.isValid(token, userDetails)) {
+                User dbUser = (User) userDetails;
+                UserPrincipal authenticatedUser = new UserPrincipal(
+                        dbUser.getId(), dbUser.getUsername(), dbUser.getRole());
+
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
+                        authenticatedUser, null, userDetails.getAuthorities());
 
                 usernamePasswordAuthenticationToken
                         .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
