@@ -31,24 +31,18 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public OperationResult<Collection<Event>> getForUser(String token) {
-        if (!jwtService.isValid(token)) {
-            return new OperationResult<>(ResultStatus.INVALID_INPUT, null);
-        }
+    public OperationResult<Collection<Event>> getForUser(String username) {
 
-        UUID userId = UUID.fromString(jwtService.extractId(token));
+        return null;
 
-        List<Event> events = repo.findByUserId(userId);
 
-        return new OperationResult<>(ResultStatus.SUCCESS, events);
+//        List<Event> events = repo.findByUserId(userId);
+//
+//        return new OperationResult<>(ResultStatus.SUCCESS, events);
     }
 
     @Override
     public OperationResult<Event> getById(UUID id, String token) {
-        if (!jwtService.isValid(token)) {
-            return new OperationResult<>(ResultStatus.INVALID_INPUT, null);
-        }
-
         UUID userId = UUID.fromString(jwtService.extractId(token));
 
         Optional<Event> eventOpt = repo.findById(id);
