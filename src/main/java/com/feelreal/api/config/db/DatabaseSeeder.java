@@ -1,4 +1,4 @@
-package com.feelreal.api.config;
+package com.feelreal.api.config.db;
 
 import com.feelreal.api.model.Job;
 import com.feelreal.api.model.User;

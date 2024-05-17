@@ -16,7 +16,7 @@ public interface EventService {
 
     OperationResult<Collection<Event>> getForUser(String token);
 
-    OperationResult<Event> getById(UUID id, String token);
+    OperationResult<Event> getById(UUID id, UUID userId);
 
     OperationResult<UUID> update(EventEditRequest data);
 

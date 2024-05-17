@@ -1,11 +1,13 @@
 package com.feelreal.api.contoller;
 
+import com.feelreal.api.config.jwt.UserPrincipal;
 import com.feelreal.api.dto.common.OperationResult;
 import com.feelreal.api.model.Event;
 import com.feelreal.api.service.event.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
@@ -23,8 +25,8 @@ public class EventController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Event> getById(@PathVariable("id") UUID id, @RequestHeader("Authorization") String authorization) {
-        OperationResult<Event> result = service.getById(id, authorization.replace("Bearer ", ""));
+    public ResponseEntity<Event> getById(@PathVariable("id") UUID id, @AuthenticationPrincipal UserPrincipal user) {
+        OperationResult<Event> result = service.getById(id, user.getId());
 
         return switch (result.getStatus()) {
             case SUCCESS -> ResponseEntity.status(HttpStatus.OK).body(result.getData());
