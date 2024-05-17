@@ -12,14 +12,14 @@ import java.util.UUID;
 @Service
 public interface EventService {
 
-    OperationResult<UUID> create(EventCreateRequest data, String token);
+    OperationResult<UUID> create(EventCreateRequest data, UUID userId);
 
-    OperationResult<Collection<Event>> getForUser(String token);
+    OperationResult<Collection<Event>> getForUser(UUID userId);
 
-    OperationResult<Event> getById(UUID id, String token);
+    OperationResult<Event> getById(UUID id, UUID userId);
 
-    OperationResult<UUID> update(EventEditRequest data);
+    OperationResult<UUID> update(EventEditRequest data, UUID userId);
 
-    OperationResult<Object> delete(UUID id);
+    OperationResult<Object> delete(UUID id, UUID userId);
 
 }

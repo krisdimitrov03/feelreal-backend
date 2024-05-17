@@ -2,12 +2,13 @@ package com.feelreal.api.contoller;
 
 import com.feelreal.api.dto.common.OperationResult;
 import com.feelreal.api.dto.event.EventCreateRequest;
+import com.feelreal.api.config.jwt.UserPrincipal;
 import com.feelreal.api.model.Event;
 import com.feelreal.api.service.event.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
@@ -25,8 +26,9 @@ public class EventController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Event> getById(@PathVariable("id") UUID id, @RequestHeader("Authorization") String authorization) {
-        OperationResult<Event> result = service.getById(id, authorization.replace("Bearer ", ""));
+
+    public ResponseEntity<Event> getById(@PathVariable("id") UUID id, @AuthenticationPrincipal UserPrincipal user) {
+        OperationResult<Event> result = service.getById(id, user.getId());
 
         return switch (result.getStatus()) {
             case SUCCESS -> ResponseEntity.status(HttpStatus.OK).body(result.getData());
@@ -38,8 +40,8 @@ public class EventController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<Collection<Event>> getForUser(@RequestHeader("Authorization") String authorization) {
-        OperationResult<Collection<Event>> result = service.getForUser(authorization.replace("Bearer ", ""));
+    public ResponseEntity<Collection<Event>> getForUser(@AuthenticationPrincipal UserPrincipal user) {
+        OperationResult<Collection<Event>> result = service.getForUser(user.getId());
 
         return switch (result.getStatus()) {
             case SUCCESS -> ResponseEntity.status(HttpStatus.OK).body(result.getData());
@@ -49,8 +51,8 @@ public class EventController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<UUID> create(@RequestBody EventCreateRequest event, @RequestHeader("Authorization") String authorization) {
-        OperationResult<UUID> result = service.create(event, authorization.replace("Bearer ", ""));
+    public ResponseEntity<UUID> create(@RequestBody EventCreateRequest event, @AuthenticationPrincipal UserPrincipal user) {
+        OperationResult<UUID> result = service.create(event, user.getId());
 
         return switch (result.getStatus()) {
             case SUCCESS -> ResponseEntity.status(HttpStatus.CREATED).body(result.getData());
@@ -60,5 +62,4 @@ public class EventController {
             case INTERNAL_ERROR -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         };
     }
-
 }
