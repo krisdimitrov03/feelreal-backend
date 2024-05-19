@@ -96,11 +96,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean userExists(UUID id) {
-        return repo.existsById(id);
-    }
-
-    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return repo.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));

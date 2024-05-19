@@ -82,7 +82,7 @@ public class JwtService {
             return false;
         }
 
-        return !extractExpiration(token).isAfter(LocalDate.now());
+        return !extractExpiration(token).isBefore(LocalDate.now());
     }
 
     private Claims extractAllClaims(String token) {

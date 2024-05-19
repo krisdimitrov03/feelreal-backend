@@ -99,6 +99,23 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public OperationResult<Object> delete(UUID id, UUID userId) {
+        Optional<Event> event = eventRepo.findById(id);
+
+        if (event.isEmpty()) {
+            return new OperationResult<>(ResultStatus.DOES_NOT_EXIST, null);
+        }
+
+        if (!event.get().getUser().getId().equals(userId)) {
+            return new OperationResult<>(ResultStatus.NO_PERMISSION, null);
+        }
+
+        try {
+            eventRepo.delete(event.get());
+            eventRepo.flush();
+        } catch (Exception e) {
+            return new OperationResult<>(ResultStatus.INTERNAL_ERROR, null);
+        }
+
         return new OperationResult<>(ResultStatus.SUCCESS, null);
     }
 
