@@ -46,6 +46,7 @@ public class EventController {
         return switch (result.getStatus()) {
             case SUCCESS -> ResponseEntity.status(HttpStatus.OK).body(result.getData());
             case INVALID_INPUT -> ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            case NO_PERMISSION -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             default -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         };
     }

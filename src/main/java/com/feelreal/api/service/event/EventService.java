@@ -18,7 +18,7 @@ public interface EventService {
 
     OperationResult<Event> getById(UUID id, UUID userId);
 
-    OperationResult<UUID> update(EventEditRequest data, UUID userId);
+    OperationResult<UUID> update(UUID eventId, EventEditRequest data, UUID userId);
 
     OperationResult<Object> delete(UUID id, UUID userId);
 

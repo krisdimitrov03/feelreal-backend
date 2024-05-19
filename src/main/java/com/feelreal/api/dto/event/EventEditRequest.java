@@ -3,13 +3,9 @@ package com.feelreal.api.dto.event;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.UUID;
-
 @Getter
 @AllArgsConstructor
 public class EventEditRequest {
-
-    private UUID id;
 
     private String title;
 
@@ -19,6 +15,6 @@ public class EventEditRequest {
 
     private String dateTimeEnd;
 
-    private int repeatMode;
+    private int repeatMode = -1;
 
 }
