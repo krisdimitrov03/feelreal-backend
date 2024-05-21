@@ -31,6 +31,7 @@ public class JwtService {
 
     public String extractId(String token) {
         return extractClaim(token, t -> t.get("id", String.class));
+
     }
 
     public String extractRole(String token) {
@@ -81,7 +82,7 @@ public class JwtService {
             return false;
         }
 
-        return !extractExpiration(token).isAfter(LocalDate.now());
+        return !extractExpiration(token).isBefore(LocalDate.now());
     }
 
     private Claims extractAllClaims(String token) {
@@ -117,4 +118,5 @@ public class JwtService {
                 claims.get("role", String.class)
         );
     }
+
 }

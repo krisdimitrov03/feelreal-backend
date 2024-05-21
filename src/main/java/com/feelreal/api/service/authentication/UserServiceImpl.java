@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -87,6 +88,11 @@ public class UserServiceImpl implements UserService {
         String token = jwtService.generateToken(tokenData);
 
         return Optional.of(token);
+    }
+
+    @Override
+    public Optional<User> getById(UUID id) {
+        return repo.findById(id);
     }
 
     @Override
