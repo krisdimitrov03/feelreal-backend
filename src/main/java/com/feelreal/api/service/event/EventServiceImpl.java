@@ -3,6 +3,7 @@ package com.feelreal.api.service.event;
 import com.feelreal.api.dto.common.OperationResult;
 import com.feelreal.api.dto.common.ResultStatus;
 import com.feelreal.api.dto.event.EventCreateRequest;
+import com.feelreal.api.dto.event.EventDetailsResponse;
 import com.feelreal.api.dto.event.EventEditRequest;
 import com.feelreal.api.model.Event;
 import com.feelreal.api.model.User;
@@ -49,20 +50,27 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public OperationResult<Collection<Event>> getForUser(UUID userId) {
+    public OperationResult<Collection<EventDetailsResponse>> getForUser(UUID userId) {
         Optional<User> user = userService.getById(userId);
 
         if (user.isEmpty()) {
             return new OperationResult<>(ResultStatus.NO_PERMISSION, null);
         }
 
-        List<Event> events = eventRepo.findByUser(user.get());
+        List<EventDetailsResponse> events = eventRepo.findByUser(user.get()).stream().map(event -> new EventDetailsResponse(
+                event.getId(),
+                event.getTitle(),
+                event.getNotes(),
+                event.getDateTimeStart().toString(),
+                event.getDateTimeEnd().toString(),
+                event.getRepeatMode()
+        )).toList();
 
         return new OperationResult<>(ResultStatus.SUCCESS, events);
     }
 
     @Override
-    public OperationResult<Event> getById(UUID id, UUID userId) {
+    public OperationResult<EventDetailsResponse> getById(UUID id, UUID userId) {
         Optional<Event> event = eventRepo.findById(id);
 
         if (event.isEmpty()) {
@@ -73,7 +81,16 @@ public class EventServiceImpl implements EventService {
             return new OperationResult<>(ResultStatus.NO_PERMISSION, null);
         }
 
-        return new OperationResult<>(ResultStatus.SUCCESS, event.get());
+        EventDetailsResponse response = new EventDetailsResponse(
+                event.get().getId(),
+                event.get().getTitle(),
+                event.get().getNotes(),
+                event.get().getDateTimeStart().toString(),
+                event.get().getDateTimeEnd().toString(),
+                event.get().getRepeatMode()
+        );
+
+        return new OperationResult<>(ResultStatus.SUCCESS, response);
     }
 
     @Override

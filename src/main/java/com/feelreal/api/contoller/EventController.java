@@ -3,8 +3,8 @@ package com.feelreal.api.contoller;
 import com.feelreal.api.dto.common.OperationResult;
 import com.feelreal.api.dto.event.EventCreateRequest;
 import com.feelreal.api.config.jwt.UserPrincipal;
+import com.feelreal.api.dto.event.EventDetailsResponse;
 import com.feelreal.api.dto.event.EventEditRequest;
-import com.feelreal.api.model.Event;
 import com.feelreal.api.service.event.EventService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +29,8 @@ public class EventController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Event> getById(@PathVariable("id") UUID id, @AuthenticationPrincipal UserPrincipal user) {
-        OperationResult<Event> result = service.getById(id, user.getId());
+    public ResponseEntity<EventDetailsResponse> getById(@PathVariable("id") UUID id, @AuthenticationPrincipal UserPrincipal user) {
+        OperationResult<EventDetailsResponse> result = service.getById(id, user.getId());
 
         return switch (result.getStatus()) {
             case SUCCESS -> ResponseEntity.status(HttpStatus.OK).body(result.getData());
@@ -42,8 +42,8 @@ public class EventController {
     }
 
     @GetMapping
-    public ResponseEntity<Collection<Event>> getForUser(@AuthenticationPrincipal UserPrincipal user) {
-        OperationResult<Collection<Event>> result = service.getForUser(user.getId());
+    public ResponseEntity<Collection<EventDetailsResponse>> getForUser(@AuthenticationPrincipal UserPrincipal user) {
+        OperationResult<Collection<EventDetailsResponse>> result = service.getForUser(user.getId());
 
         return switch (result.getStatus()) {
             case SUCCESS -> ResponseEntity.status(HttpStatus.OK).body(result.getData());

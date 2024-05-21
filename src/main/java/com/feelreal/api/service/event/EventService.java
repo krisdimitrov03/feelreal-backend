@@ -2,8 +2,8 @@ package com.feelreal.api.service.event;
 
 import com.feelreal.api.dto.common.OperationResult;
 import com.feelreal.api.dto.event.EventCreateRequest;
+import com.feelreal.api.dto.event.EventDetailsResponse;
 import com.feelreal.api.dto.event.EventEditRequest;
-import com.feelreal.api.model.Event;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -14,9 +14,9 @@ public interface EventService {
 
     OperationResult<UUID> create(EventCreateRequest data, UUID userId);
 
-    OperationResult<Collection<Event>> getForUser(UUID userId);
+    OperationResult<Collection<EventDetailsResponse>> getForUser(UUID userId);
 
-    OperationResult<Event> getById(UUID id, UUID userId);
+    OperationResult<EventDetailsResponse> getById(UUID id, UUID userId);
 
     OperationResult<UUID> update(UUID eventId, EventEditRequest data, UUID userId);
 
