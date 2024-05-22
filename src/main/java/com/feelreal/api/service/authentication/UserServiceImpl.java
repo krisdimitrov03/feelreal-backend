@@ -1,11 +1,10 @@
 package com.feelreal.api.service.authentication;
 
-import com.feelreal.api.dto.authentication.LoginRequest;
-import com.feelreal.api.dto.authentication.RegisterResponse;
-import com.feelreal.api.dto.authentication.TokenData;
+import com.feelreal.api.dto.authentication.*;
+import com.feelreal.api.dto.common.OperationResult;
+import com.feelreal.api.dto.common.ResultStatus;
 import com.feelreal.api.model.Job;
 import com.feelreal.api.model.User;
-import com.feelreal.api.dto.authentication.RegisterRequest;
 import com.feelreal.api.model.enumeration.Role;
 import com.feelreal.api.repository.UserRepository;
 import com.feelreal.api.service.job.JobService;
@@ -96,6 +95,59 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public OperationResult<UserProfile> getProfile(UUID id, UUID principalId) {
+        Optional<User> user = getById(id);
+
+        if (user.isEmpty()) {
+            return new OperationResult<>(ResultStatus.DOES_NOT_EXIST, null);
+        }
+
+        UserProfile profile = new UserProfile(
+                user.get().getId(),
+                user.get().getUsername(),
+                null,
+                user.get().getFirstName(),
+                user.get().getLastName(),
+                null,
+                user.get().getJob().getName()
+        );
+
+        if (user.get().getId().equals(principalId)) {
+            profile.setEmail(user.get().getEmail());
+            profile.setDateOfBirth(user.get().getDateOfBirth().toString());
+        }
+
+        return new OperationResult<>(ResultStatus.SUCCESS, profile);
+    }
+
+    @Override
+    public OperationResult<UUID> updateProfile(UUID id, UserUpdateRequest data, UUID principalId) {
+        Optional<User> userOpt = getById(id);
+
+        if (userOpt.isEmpty()) {
+            return new OperationResult<>(ResultStatus.DOES_NOT_EXIST, null);
+        }
+
+        if (!userOpt.get().getId().equals(principalId)) {
+            return new OperationResult<>(ResultStatus.NO_PERMISSION, null);
+        }
+
+        Optional<Job> job = data.getJobId() == null
+                ? Optional.empty()
+                : jobService.getById(UUID.fromString(data.getJobId()));
+
+        if (job.isEmpty()) {
+            return new OperationResult<>(ResultStatus.INVALID_INPUT, null);
+        }
+
+        User updatedUser = updateUserEntity(data, userOpt.get(), job.get());
+
+        repo.saveAndFlush(updatedUser);
+
+        return new OperationResult<>(ResultStatus.SUCCESS, userOpt.get().getId());
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return repo.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -114,4 +166,31 @@ public class UserServiceImpl implements UserService {
                 LocalDate.now()
         );
     }
+
+    private User updateUserEntity(UserUpdateRequest data, User user, Job job) {
+        if (data.getUsername() != null) {
+            user.setUsername(data.getUsername());
+        }
+
+        if (data.getEmail() != null) {
+            user.setEmail(data.getEmail());
+        }
+
+        if (data.getFirstName() != null) {
+            user.setFirstName(data.getFirstName());
+        }
+
+        if (data.getLastName() != null) {
+            user.setLastName(data.getLastName());
+        }
+
+        if (data.getDateOfBirth() != null) {
+            user.setDateOfBirth(LocalDate.parse(data.getDateOfBirth()));
+        }
+
+        user.setJob(job);
+
+        return user;
+    }
+
 }

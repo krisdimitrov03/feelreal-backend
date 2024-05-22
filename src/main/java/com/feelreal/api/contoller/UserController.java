@@ -1,9 +1,9 @@
 package com.feelreal.api.contoller;
 
-import com.feelreal.api.dto.authentication.LoginRequest;
-import com.feelreal.api.dto.authentication.LoginResponse;
-import com.feelreal.api.dto.authentication.RegisterRequest;
-import com.feelreal.api.dto.authentication.RegisterResponse;
+import com.feelreal.api.config.jwt.UserPrincipal;
+import com.feelreal.api.dto.authentication.*;
+import com.feelreal.api.dto.common.OperationResult;
+import com.feelreal.api.model.User;
 import com.feelreal.api.service.authentication.UserService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -11,15 +11,18 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @RestController()
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class UserController {
     private final UserService userService;
     private final Logger logger;
@@ -65,4 +68,33 @@ public class UserController {
                 ).orElseGet(() -> ResponseEntity.ok().body(new LoginResponse(false, null)));
 
     }
+
+    @GetMapping("/authenticate")
+    public ResponseEntity<Boolean> authenticate(@AuthenticationPrincipal UserPrincipal principal) {
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserProfile> viewProfile(@PathVariable("id") UUID id, @AuthenticationPrincipal UserPrincipal principal) {
+        OperationResult<UserProfile> result = userService.getProfile(id, principal.getId());
+
+        return switch (result.getStatus()) {
+            case SUCCESS -> ResponseEntity.ok().body(result.getData());
+            case DOES_NOT_EXIST -> ResponseEntity.notFound().build();
+            default -> ResponseEntity.badRequest().build();
+        };
+    }
+
+    public ResponseEntity<UUID> updateProfile(@PathVariable("id") UUID id, @RequestBody UserUpdateRequest data, @AuthenticationPrincipal UserPrincipal principal) {
+        OperationResult<UUID> result = userService.updateProfile(id, data, principal.getId());
+
+        return switch (result.getStatus()) {
+            case SUCCESS -> ResponseEntity.ok().body(result.getData());
+            case NO_PERMISSION -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            case DOES_NOT_EXIST -> ResponseEntity.notFound().build();
+            case INVALID_INPUT -> ResponseEntity.badRequest().build();
+            case INTERNAL_ERROR -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        };
+    }
+
 }
