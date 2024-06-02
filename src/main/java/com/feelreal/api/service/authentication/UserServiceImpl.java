@@ -122,13 +122,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public OperationResult<UUID> updateProfile(UUID id, UserUpdateRequest data, UUID principalId) {
-        Optional<User> userOpt = getById(id);
+        Optional<User> user = getById(id);
 
-        if (userOpt.isEmpty()) {
+        if (user.isEmpty()) {
             return new OperationResult<>(ResultStatus.DOES_NOT_EXIST, null);
         }
 
-        if (!userOpt.get().getId().equals(principalId)) {
+        if (!user.get().getId().equals(principalId)) {
             return new OperationResult<>(ResultStatus.NO_PERMISSION, null);
         }
 
@@ -140,11 +140,29 @@ public class UserServiceImpl implements UserService {
             return new OperationResult<>(ResultStatus.INVALID_INPUT, null);
         }
 
-        User updatedUser = updateUserEntity(data, userOpt.get(), job.get());
+        User updatedUser = updateUserEntity(data, user.get(), job.get());
 
         repo.saveAndFlush(updatedUser);
 
-        return new OperationResult<>(ResultStatus.SUCCESS, userOpt.get().getId());
+        return new OperationResult<>(ResultStatus.SUCCESS, user.get().getId());
+    }
+
+    @Override
+    public OperationResult<UUID> deleteProfile(UUID id, UUID principalId) {
+        Optional<User> user = getById(id);
+
+        if (user.isEmpty()) {
+            return new OperationResult<>(ResultStatus.DOES_NOT_EXIST, null);
+        }
+
+        if (!user.get().getId().equals(principalId)) {
+            return new OperationResult<>(ResultStatus.NO_PERMISSION, null);
+        }
+
+        repo.delete(user.get());
+        repo.flush();
+
+        return new OperationResult<>(ResultStatus.SUCCESS, user.get().getId());
     }
 
     @Override

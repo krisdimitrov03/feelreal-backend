@@ -22,4 +22,6 @@ public interface UserService extends UserDetailsService {
 
     OperationResult<UUID> updateProfile(UUID id, UserUpdateRequest data, UUID principalId);
 
+    OperationResult<UUID> deleteProfile(UUID id, UUID principalId);
+
 }

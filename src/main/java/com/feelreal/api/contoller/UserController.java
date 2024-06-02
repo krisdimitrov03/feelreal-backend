@@ -3,7 +3,6 @@ package com.feelreal.api.contoller;
 import com.feelreal.api.config.jwt.UserPrincipal;
 import com.feelreal.api.dto.authentication.*;
 import com.feelreal.api.dto.common.OperationResult;
-import com.feelreal.api.model.User;
 import com.feelreal.api.service.authentication.UserService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -85,6 +84,7 @@ public class UserController {
         };
     }
 
+    @PutMapping("/{id}")
     public ResponseEntity<UUID> updateProfile(@PathVariable("id") UUID id, @RequestBody UserUpdateRequest data, @AuthenticationPrincipal UserPrincipal principal) {
         OperationResult<UUID> result = userService.updateProfile(id, data, principal.getId());
 
@@ -94,6 +94,19 @@ public class UserController {
             case DOES_NOT_EXIST -> ResponseEntity.notFound().build();
             case INVALID_INPUT -> ResponseEntity.badRequest().build();
             case INTERNAL_ERROR -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        };
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<UUID> deleteProfile(@PathVariable("id") UUID id, @AuthenticationPrincipal UserPrincipal principal) {
+        OperationResult<UUID> result = userService.deleteProfile(id, principal.getId());
+
+        return switch (result.getStatus()) {
+            case SUCCESS -> ResponseEntity.noContent().build();
+            case NO_PERMISSION -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            case DOES_NOT_EXIST -> ResponseEntity.notFound().build();
+            case INTERNAL_ERROR -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            default -> ResponseEntity.badRequest().build();
         };
     }
 
