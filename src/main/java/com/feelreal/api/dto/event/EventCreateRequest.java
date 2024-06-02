@@ -31,7 +31,4 @@ public class EventCreateRequest {
     @Range(min = 0, max = 3)
     private int repeatMode;
 
-    @NotNull
-    private String userId;
-
 }
