@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.feelreal</groupId>
 	<artifactId>api</artifactId>
-	<version>0.0.8</version>
+	<version>0.0.9</version>
 	<name>FeelReal</name>
 	<description>Web application for good mental health and wellness</description>
 	<properties>
