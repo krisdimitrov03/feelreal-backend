@@ -6,7 +6,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cglib.core.Local;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -39,10 +38,14 @@ public class JwtService {
     }
 
     public LocalDate extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration)
-                .toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
+        try {
+            return Objects.requireNonNull(extractClaim(token, Claims::getExpiration))
+                    .toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public String generateToken(TokenData data) {
@@ -66,23 +69,27 @@ public class JwtService {
     }
 
     public boolean isValid(String token, UserDetails userDetails) {
-        TokenData tokenData = extractTokenData(token);
+        try {
+            TokenData tokenData = extractTokenData(token);
 
-        if (tokenData == null) {
+            if (tokenData == null) {
+                return false;
+            }
+
+            if (tokenData.getId() == null || tokenData.getUsername() == null ||
+                    tokenData.getEmail() == null || tokenData.getRole() == null) {
+                return false;
+            }
+
+            if (!tokenData.getUsername().equals(userDetails.getUsername()) ||
+                    userDetails.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals(tokenData.getRole()))) {
+                return false;
+            }
+
+            return !extractExpiration(token).isBefore(LocalDate.now());
+        } catch (Exception e) {
             return false;
         }
-
-        if (tokenData.getId() == null || tokenData.getUsername() == null ||
-                tokenData.getEmail() == null || tokenData.getRole() == null) {
-            return false;
-        }
-
-        if (!tokenData.getUsername().equals(userDetails.getUsername()) ||
-                userDetails.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals(tokenData.getRole()))) {
-            return false;
-        }
-
-        return !extractExpiration(token).isBefore(LocalDate.now());
     }
 
     private Claims extractAllClaims(String token) {
@@ -100,8 +107,12 @@ public class JwtService {
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> resolver) {
-        Claims claims = extractAllClaims(token);
-        return resolver.apply(claims);
+        try {
+            Claims claims = extractAllClaims(token);
+            return resolver.apply(claims);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private TokenData extractTokenData(String token) {
