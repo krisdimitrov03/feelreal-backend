@@ -1,5 +1,6 @@
 package com.feelreal.api.dto.authentication;
 
+import com.feelreal.api.model.Job;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -24,6 +25,6 @@ public class UserProfile {
 
     private String dateOfBirth;
 
-    private String jobName;
+    private Job job;
 
 }
