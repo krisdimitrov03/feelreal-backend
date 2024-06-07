@@ -109,7 +109,7 @@ public class UserServiceImpl implements UserService {
                 user.get().getFirstName(),
                 user.get().getLastName(),
                 null,
-                user.get().getJob().getName()
+                user.get().getJob()
         );
 
         if (user.get().getId().equals(principalId)) {
