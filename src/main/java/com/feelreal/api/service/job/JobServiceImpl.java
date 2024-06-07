@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -21,5 +22,10 @@ public class JobServiceImpl implements JobService {
     @Override
     public Optional<Job> getById(UUID id) {
         return repo.findById(id);
+    }
+
+    @Override
+    public List<Job> getAll() {
+        return repo.findAll();
     }
 }
