@@ -2,16 +2,17 @@ package com.feelreal.api.service.wellnessChecks;
 
 import com.feelreal.api.dto.common.OperationResult;
 import com.feelreal.api.dto.common.ResultStatus;
-import com.feelreal.api.dto.wellnesschecks.WellnessCheckDetailsResponse;
+import com.feelreal.api.dto.wellnesschecks.WellnessCheckRequest;
+import com.feelreal.api.dto.wellnesschecks.WellnessCheckResponse;
 import com.feelreal.api.model.User;
 import com.feelreal.api.model.WellnessCheck;
-import com.feelreal.api.model.enumeration.WellnessCheckType;
-import com.feelreal.api.repository.UserRepository;
 import com.feelreal.api.repository.WellnessCheckRepository;
 import com.feelreal.api.service.authentication.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,17 +33,17 @@ public class WellnessCheckServiceImpl implements WellnessCheckService {
     }
 
     @Override
-    public OperationResult<List<WellnessCheckDetailsResponse>> getForUser(UUID userId) {
+    public OperationResult<List<WellnessCheckResponse>> getForUser(UUID userId) {
         Optional<User> user = userService.getById(userId);
 
         if (user.isEmpty()) {
             return new OperationResult<>(ResultStatus.NO_PERMISSION, null);
         }
 
-        List<WellnessCheckDetailsResponse> checks = wellnessCheckRepository
+        List<WellnessCheckResponse> checks = wellnessCheckRepository
                 .findAllByUserId(userId)
                 .stream()
-                .map(check -> new WellnessCheckDetailsResponse(
+                .map(check -> new WellnessCheckResponse(
                         check.getId(),
                         check.getType().ordinal(),
                         check.getValue(),
@@ -55,7 +56,7 @@ public class WellnessCheckServiceImpl implements WellnessCheckService {
     }
 
     @Override
-    public OperationResult<WellnessCheckDetailsResponse> getById(UUID id, UUID userId) {
+    public OperationResult<WellnessCheckResponse> getById(UUID id, UUID userId) {
         Optional<User> user = userService.getById(userId);
 
         if (user.isEmpty()) {
@@ -68,11 +69,11 @@ public class WellnessCheckServiceImpl implements WellnessCheckService {
             return new OperationResult<>(ResultStatus.DOES_NOT_EXIST, null);
         }
 
-        if (check.get().getUser().equals(user.get())) {
+        if (!check.get().getUser().equals(user.get())) {
             return new OperationResult<>(ResultStatus.NO_PERMISSION, null);
         }
 
-        WellnessCheckDetailsResponse response = new WellnessCheckDetailsResponse(
+        WellnessCheckResponse response = new WellnessCheckResponse(
                 check.get().getId(),
                 check.get().getType().ordinal(),
                 check.get().getValue(),
@@ -84,22 +85,29 @@ public class WellnessCheckServiceImpl implements WellnessCheckService {
     }
 
     @Override
-    public OperationResult<UUID> create(WellnessCheckDetailsResponse data, UUID userId) {
+    public OperationResult<UUID> create(WellnessCheckRequest data, UUID userId) {
         Optional<User> user = userService.getById(userId);
 
         if (user.isEmpty()) {
             return new OperationResult<>(ResultStatus.NO_PERMISSION, null);
         }
 
-        WellnessCheck wellnessCheck = createWellnessCheck(data, user.get());
+        try {
 
-        wellnessCheckRepository.saveAndFlush(wellnessCheck);
+            WellnessCheck wellnessCheck = createWellnessCheck(data, user.get());
+            wellnessCheckRepository.saveAndFlush(wellnessCheck);
 
-        return new OperationResult<>(ResultStatus.SUCCESS, wellnessCheck.getId());
+            return new OperationResult<>(ResultStatus.SUCCESS, wellnessCheck.getId());
+
+        } catch (DateTimeParseException e) {
+            return new OperationResult<>(ResultStatus.INVALID_INPUT, null);
+        } catch (Exception e) {
+            return new OperationResult<>(ResultStatus.INTERNAL_ERROR, null);
+        }
     }
 
     @Override
-    public OperationResult<UUID> update(UUID id, WellnessCheckDetailsResponse data, UUID userId) {
+    public OperationResult<UUID> update(UUID id, WellnessCheckRequest data, UUID userId) {
         Optional<User> user = userService.getById(userId);
 
         if (user.isEmpty()) {
@@ -112,10 +120,18 @@ public class WellnessCheckServiceImpl implements WellnessCheckService {
             return new OperationResult<>(ResultStatus.DOES_NOT_EXIST, null);
         }
 
-        WellnessCheck check = updateCheck(checkFromDb.get(), data);
-        wellnessCheckRepository.saveAndFlush(check);
+        try {
 
-        return new OperationResult<>(ResultStatus.SUCCESS, check.getId());
+            WellnessCheck check = updateWellnessCheck(checkFromDb.get(), data);
+            wellnessCheckRepository.saveAndFlush(check);
+
+            return new OperationResult<>(ResultStatus.SUCCESS, check.getId());
+
+        } catch (DateTimeParseException e) {
+            return new OperationResult<>(ResultStatus.INVALID_INPUT, null);
+        } catch (Exception e) {
+            return new OperationResult<>(ResultStatus.INTERNAL_ERROR, null);
+        }
     }
 
     @Override
@@ -142,17 +158,15 @@ public class WellnessCheckServiceImpl implements WellnessCheckService {
         return new OperationResult<>(ResultStatus.SUCCESS, id);
     }
 
-    private WellnessCheck createWellnessCheck(WellnessCheckDetailsResponse data, User user) {
-        WellnessCheck wellnessCheck = new WellnessCheck();
-        wellnessCheck.setUser(user);
-        wellnessCheck.setType(WellnessCheckType.fromOrdinal(data.getType()));
-        // TODO: Fix this
-//        wellnessCheck.setValue(data.getValue());
-//        wellnessCheck.setDate(LocalDate.parse(data.getDate()));
-        return wellnessCheck;
+    private WellnessCheck createWellnessCheck(WellnessCheckRequest data, User user) {
+        return new WellnessCheck(user, data.getType(), data.getValue(), LocalDate.parse(data.getDate()));
     }
 
-    private WellnessCheck updateCheck(WellnessCheck check, WellnessCheckDetailsResponse data) {
+    private WellnessCheck updateWellnessCheck(WellnessCheck check, WellnessCheckRequest data) {
+        check.setType(data.getType());
+        check.setValue(data.getValue());
+        check.setDate(LocalDate.parse(data.getDate()));
+
         return check;
     }
 }
