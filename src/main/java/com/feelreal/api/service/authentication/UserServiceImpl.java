@@ -121,7 +121,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public OperationResult<UUID> updateProfile(UUID id, UserUpdateRequest data, UUID principalId) {
+    public OperationResult<UpdateProfileResult> updateProfile(UUID id, UserUpdateRequest data, UUID principalId) {
         Optional<User> user = getById(id);
 
         if (user.isEmpty()) {
@@ -142,9 +142,16 @@ public class UserServiceImpl implements UserService {
 
         User updatedUser = updateUserEntity(data, user.get(), job.get());
 
+        String token = jwtService.generateToken(new TokenData(
+                updatedUser.getId().toString(),
+                updatedUser.getUsername(),
+                updatedUser.getEmail(),
+                updatedUser.getRole().getValue())
+        );
+
         repo.saveAndFlush(updatedUser);
 
-        return new OperationResult<>(ResultStatus.SUCCESS, user.get().getId());
+        return new OperationResult<>(ResultStatus.SUCCESS, new UpdateProfileResult(updatedUser.getId(), token));
     }
 
     @Override

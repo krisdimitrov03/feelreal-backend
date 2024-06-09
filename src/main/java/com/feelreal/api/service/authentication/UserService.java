@@ -20,7 +20,7 @@ public interface UserService extends UserDetailsService {
 
     OperationResult<UserProfile> getProfile(UUID id, UUID principalId);
 
-    OperationResult<UUID> updateProfile(UUID id, UserUpdateRequest data, UUID principalId);
+    OperationResult<UpdateProfileResult> updateProfile(UUID id, UserUpdateRequest data, UUID principalId);
 
     OperationResult<UUID> deleteProfile(UUID id, UUID principalId);
 

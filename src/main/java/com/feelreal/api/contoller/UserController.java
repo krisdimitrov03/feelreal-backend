@@ -85,8 +85,8 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UUID> updateProfile(@PathVariable("id") UUID id, @RequestBody UserUpdateRequest data, @AuthenticationPrincipal UserPrincipal principal) {
-        OperationResult<UUID> result = userService.updateProfile(id, data, principal.getId());
+    public ResponseEntity<UpdateProfileResult> updateProfile(@PathVariable("id") UUID id, @RequestBody UserUpdateRequest data, @AuthenticationPrincipal UserPrincipal principal) {
+        OperationResult<UpdateProfileResult> result = userService.updateProfile(id, data, principal.getId());
 
         return switch (result.getStatus()) {
             case SUCCESS -> ResponseEntity.ok().body(result.getData());
