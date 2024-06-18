@@ -1,18 +1,29 @@
 package com.feelreal.api.config.db;
 
+import com.feelreal.api.dto.article.ArticleCreateRequest;
+import com.feelreal.api.model.Article;
 import com.feelreal.api.model.Job;
 import com.feelreal.api.model.User;
+import com.feelreal.api.model.enumeration.ArticleType;
 import com.feelreal.api.model.enumeration.Intensity;
 import com.feelreal.api.model.enumeration.Role;
+import com.feelreal.api.repository.ArticleRepository;
 import com.feelreal.api.repository.JobRepository;
 import com.feelreal.api.repository.UserRepository;
+import com.google.gson.Gson;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -20,13 +31,20 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     private final UserRepository userRepository;
     private final JobRepository jobRepository;
+    private final ArticleRepository articleRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public DatabaseSeeder(UserRepository userRepository, PasswordEncoder passwordEncoder, JobRepository jobRepository) {
+    public DatabaseSeeder(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            JobRepository jobRepository,
+            ArticleRepository articleRepository
+    ) {
         this.userRepository = userRepository;
         this.jobRepository = jobRepository;
         this.passwordEncoder = passwordEncoder;
+        this.articleRepository = articleRepository;
     }
 
     @Transactional
@@ -34,6 +52,7 @@ public class DatabaseSeeder implements CommandLineRunner {
     public void run(String... args) throws Exception {
         List<Job> jobs = seedJobs();
         seedUsers(jobs);
+        seedArticles();
     }
 
     private List<Job> seedJobs() {
@@ -67,5 +86,30 @@ public class DatabaseSeeder implements CommandLineRunner {
         userRepository.save(admin);
         userRepository.save(user);
         userRepository.flush();
+    }
+
+    private void seedArticles() {
+        if (articleRepository.count() > 0) {
+            return;
+        }
+
+        try {
+            String json = new String(Files.readAllBytes(Paths.get("src/main/resources/articles.json")));
+
+            Gson gson = new Gson();
+
+            List<Article> articles = Arrays.stream(gson.fromJson(json, ArticleCreateRequest[].class))
+                    .map(a -> new Article(
+                            ArticleType.values()[a.getType()],
+                            a.getTitle(),
+                            a.getContent()
+                    ))
+                    .toList();
+
+            articleRepository.saveAll(articles);
+            articleRepository.flush();
+        } catch (IOException e) {
+            System.out.println("Error reading articles.json file");
+        }
     }
 }
