@@ -3,12 +3,13 @@ package com.feelreal.api.service.ai;
 import com.feelreal.api.dto.common.OperationResult;
 import com.feelreal.api.dto.common.ResultStatus;
 import com.feelreal.api.dto.wellnesschecks.WellnessCheckResponse;
+import com.feelreal.api.model.Article;
 import com.feelreal.api.model.User;
+import com.feelreal.api.model.enumeration.ArticleType;
+import com.feelreal.api.service.article.ArticleService;
 import com.feelreal.api.service.authentication.UserService;
-import com.feelreal.api.service.event.EventServiceImpl;
 import com.feelreal.api.service.wellnessChecks.WellnessCheckService;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,19 +33,21 @@ public class AISuggestionServiceImpl implements AISuggestionService {
     private final RestTemplate restTemplate;
     private final WellnessCheckService wellnessCheckService;
     private final UserService userService;
+    private final ArticleService articleService;
 
     @Autowired
-    public AISuggestionServiceImpl(RestTemplate restTemplate, WellnessCheckService wellnessCheckService, UserService userService) {
+    public AISuggestionServiceImpl(RestTemplate restTemplate, WellnessCheckService wellnessCheckService, UserService userService, ArticleService articleService) {
         this.restTemplate = restTemplate;
         this.wellnessCheckService = wellnessCheckService;
         this.userService = userService;
+        this.articleService = articleService;
     }
 
     @Override
-    public String recommendPersonalizedActivity(UUID uuid) {
+    public Article recommendPersonalizedActivity(UUID uuid) {
         Optional<User> userOptional = userService.getById(uuid);
         if (userOptional.isEmpty()) {
-            return "User not found";
+            return null;
         }
 
         User user = userOptional.get();
@@ -53,7 +56,7 @@ public class AISuggestionServiceImpl implements AISuggestionService {
         OperationResult<List<WellnessCheckResponse>> wellnessCheckResult = wellnessCheckService.getForUser(userId);
 
         if (wellnessCheckResult.getStatus() != ResultStatus.SUCCESS) {
-            return "Failed to retrieve wellness checks";
+            return null;
         }
 
         List<WellnessCheckResponse> wellnessChecks = wellnessCheckResult.getData();
@@ -96,7 +99,21 @@ Suggest the category for the mood of the user based on the wellness checks. The 
 Return one of the categories above. Start with your answer first, then explain it.
 """, wellnessCheckArray.toString());
 
-        return callGpt(recommendationMessage);
+        int articleTypeInt = Integer.parseInt(callGpt(recommendationMessage));
+
+        // get the articles for said type
+        ArticleType articleType = ArticleType.values()[articleTypeInt];
+
+        OperationResult<List<Article>> getArticlesResult = articleService.getByType(articleType);
+
+        if(getArticlesResult.getStatus() != ResultStatus.SUCCESS) {
+            return null;
+        }
+        List<Article> articles = getArticlesResult.getData();
+
+        // select a random article from articles
+
+        return articles.get((int) (Math.random() * articles.size()));
     }
 
     @Override

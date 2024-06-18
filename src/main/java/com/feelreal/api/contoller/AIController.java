@@ -1,6 +1,7 @@
 package com.feelreal.api.contoller;
 
 import com.feelreal.api.config.jwt.UserPrincipal;
+import com.feelreal.api.model.Article;
 import com.feelreal.api.service.ai.AISuggestionService;
 import com.feelreal.api.service.authentication.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +23,9 @@ public class AIController {
     }
 
     @GetMapping("/suggest")
-    public ResponseEntity<String> suggestActivity(@AuthenticationPrincipal UserPrincipal user) {
-        String result = aiSuggestionService.recommendPersonalizedActivity(user.getId());
+    public ResponseEntity<Article> suggestArticle(@AuthenticationPrincipal UserPrincipal user) {
+        Article result = aiSuggestionService.recommendPersonalizedActivity(user.getId());
+
         return ResponseEntity.ok().body(result);
     }
 }
