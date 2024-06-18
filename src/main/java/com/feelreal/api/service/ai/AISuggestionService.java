@@ -2,9 +2,11 @@ package com.feelreal.api.service.ai;
 
 import com.feelreal.api.model.User;
 
+import java.util.UUID;
+
 public interface AISuggestionService {
 
-    String recommendPersonalizedActivity(String user);
+    String recommendPersonalizedActivity(UUID uuid);
 
     String provideInsights(User user);
 
