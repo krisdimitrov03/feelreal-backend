@@ -73,7 +73,7 @@ public class AISuggestionServiceImpl implements AISuggestionService {
     @Override
     public OperationResult<Article> recommendPersonalizedArticle(UUID userId) {
         String prompt = buildPrompt(userId);
-        MoodType type = MoodType.values()[Integer.parseInt(callGpt(prompt))];
+        MoodType type = MoodType.values()[getArticleType(callGpt(prompt))];
 
         OperationResult<Article> result = articleService.getRandomByType(type);
 
@@ -92,7 +92,7 @@ public class AISuggestionServiceImpl implements AISuggestionService {
     @Override
     public OperationResult<Tip> recommendPersonalizedTip(UUID userId) {
         String prompt = buildPrompt(userId);
-        MoodType type = MoodType.values()[Integer.parseInt(callGpt(prompt))];
+        MoodType type = MoodType.values()[getArticleType(callGpt(prompt))];
 
         OperationResult<Tip> result = tipService.getRandomByType(type);
 

@@ -26,4 +26,9 @@ public class Tip {
     @NotNull
     private String content;
 
+    public Tip(MoodType type, String content) {
+        this.type = type;
+        this.content = content;
+    }
+
 }
