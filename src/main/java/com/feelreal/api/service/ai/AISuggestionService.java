@@ -1,15 +1,21 @@
 package com.feelreal.api.service.ai;
 
-import com.feelreal.api.model.User;
+import com.feelreal.api.dto.common.OperationResult;
+import com.feelreal.api.model.Article;
+import com.feelreal.api.model.Event;
+import com.feelreal.api.model.Tip;
+
+import java.util.List;
+import java.util.UUID;
 
 public interface AISuggestionService {
 
-    String recommendPersonalizedActivity(String user);
+    OperationResult<Article> recommendPersonalizedArticle(UUID userId);
 
-    String provideInsights(User user);
+    OperationResult<Event> recommendPersonalizedEvent(UUID userId);
 
-    String analyzeEmotion(String userText);
+    OperationResult<Tip> recommendPersonalizedTip(UUID userId);
 
-    String suggestBehaviorChange(String userActivityLog);
+    OperationResult<List<Event>> recommendPersonalizedPlan(UUID userId);
 
 }

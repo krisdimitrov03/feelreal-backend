@@ -2,7 +2,7 @@ package com.feelreal.api.service.article;
 
 import com.feelreal.api.dto.common.OperationResult;
 import com.feelreal.api.model.Article;
-import com.feelreal.api.model.enumeration.ArticleType;
+import com.feelreal.api.model.enumeration.MoodType;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +15,8 @@ public interface ArticleService {
 
     OperationResult<List<Article>> getAll();
 
-    OperationResult<List<Article>> getByType(ArticleType type);
+    OperationResult<List<Article>> getByType(MoodType type);
+
+    OperationResult<Article> getRandomByType(MoodType type);
 
 }
