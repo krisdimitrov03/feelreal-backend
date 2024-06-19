@@ -1,6 +1,6 @@
 package com.feelreal.api.model.enumeration;
 
-public enum ArticleType {
+public enum MoodType {
 
     CONSTANT_HAPPINESS,
     WAS_HAPPY_NOW_SAD,

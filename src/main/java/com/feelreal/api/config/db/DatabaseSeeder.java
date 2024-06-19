@@ -4,7 +4,7 @@ import com.feelreal.api.dto.article.ArticleCreateRequest;
 import com.feelreal.api.model.Article;
 import com.feelreal.api.model.Job;
 import com.feelreal.api.model.User;
-import com.feelreal.api.model.enumeration.ArticleType;
+import com.feelreal.api.model.enumeration.MoodType;
 import com.feelreal.api.model.enumeration.Intensity;
 import com.feelreal.api.model.enumeration.Role;
 import com.feelreal.api.repository.ArticleRepository;
@@ -17,8 +17,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -100,7 +98,7 @@ public class DatabaseSeeder implements CommandLineRunner {
 
             List<Article> articles = Arrays.stream(gson.fromJson(json, ArticleCreateRequest[].class))
                     .map(a -> new Article(
-                            ArticleType.values()[a.getType()],
+                            MoodType.values()[a.getType()],
                             a.getTitle(),
                             a.getContent()
                     ))

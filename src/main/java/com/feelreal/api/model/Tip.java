@@ -5,15 +5,14 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Length;
 
 import java.util.UUID;
 
 @Entity
 @Data
-@Table(name = "articles")
+@Table(name = "tips")
 @NoArgsConstructor
-public class Article {
+public class Tip {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -23,19 +22,8 @@ public class Article {
     @NotNull
     private MoodType type;
 
-    @Column(name = "title")
-    @NotNull
-    private String title;
-
     @Column(name = "content")
-    @Length(min = 1, max = 3000)
     @NotNull
     private String content;
-
-    public Article(MoodType type, String title, String content) {
-        this.type = type;
-        this.title = title;
-        this.content = content;
-    }
 
 }
