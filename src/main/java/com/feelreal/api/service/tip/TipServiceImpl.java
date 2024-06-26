@@ -8,6 +8,7 @@ import com.feelreal.api.repository.TipRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -47,5 +48,20 @@ public class TipServiceImpl implements TipService {
         int index = (int) (Math.random() * tips.size());
 
         return new OperationResult<>(ResultStatus.SUCCESS, tips.get(index));
+    }
+
+    @Override
+    public OperationResult<List<Tip>> getRandomNByType(MoodType type, int n) {
+        var tips = getByType(type).getData();
+
+        List<Tip> resultTips = new ArrayList<>();
+
+        for (int i = 0; i < n; i++) {
+            int index = (int) (Math.random() * tips.size());
+            resultTips.add(tips.get(index));
+            tips.remove(index);
+        }
+
+        return new OperationResult<>(ResultStatus.SUCCESS, resultTips);
     }
 }

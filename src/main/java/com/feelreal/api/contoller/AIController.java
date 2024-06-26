@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/ai")
 public class AIController {
@@ -28,9 +30,9 @@ public class AIController {
         return ResponseEntity.ok().body(result.getData());
     }
 
-    @GetMapping("/tip")
-    public ResponseEntity<Tip> suggestTip(@AuthenticationPrincipal UserPrincipal user) {
-        OperationResult<Tip> result = aiSuggestionService.recommendPersonalizedTip(user.getId());
+    @GetMapping("/tips")
+    public ResponseEntity<List<Tip>> suggestTips(@AuthenticationPrincipal UserPrincipal user) {
+        OperationResult<List<Tip>> result = aiSuggestionService.recommendPersonalizedTips(user.getId());
 
         return ResponseEntity.ok().body(result.getData());
     }

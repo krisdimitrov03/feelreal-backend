@@ -14,8 +14,6 @@ public interface AISuggestionService {
 
     OperationResult<Event> recommendPersonalizedEvent(UUID userId);
 
-    OperationResult<Tip> recommendPersonalizedTip(UUID userId);
-
-    OperationResult<List<Event>> recommendPersonalizedPlan(UUID userId);
+    OperationResult<List<Tip>> recommendPersonalizedTips(UUID userId);
 
 }

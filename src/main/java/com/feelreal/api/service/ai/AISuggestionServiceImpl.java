@@ -90,11 +90,11 @@ public class AISuggestionServiceImpl implements AISuggestionService {
     }
 
     @Override
-    public OperationResult<Tip> recommendPersonalizedTip(UUID userId) {
+    public OperationResult<List<Tip>> recommendPersonalizedTips(UUID userId) {
         String prompt = buildPrompt(userId);
         MoodType type = MoodType.values()[getArticleType(callGpt(prompt))];
 
-        OperationResult<Tip> result = tipService.getRandomByType(type);
+        OperationResult<List<Tip>> result = tipService.getRandomNByType(type, 5);
 
         if (result.getStatus() == ResultStatus.SUCCESS) {
             return new OperationResult<>(ResultStatus.SUCCESS, result.getData());
@@ -102,12 +102,6 @@ public class AISuggestionServiceImpl implements AISuggestionService {
             return new OperationResult<>(ResultStatus.INTERNAL_ERROR, null);
         }
     }
-
-    @Override
-    public OperationResult<List<Event>> recommendPersonalizedPlan(UUID userId) {
-        return null;
-    }
-
 
     private String callGpt(String messageText) {
         HttpEntity<String> entity = createHttpEntity(messageText);

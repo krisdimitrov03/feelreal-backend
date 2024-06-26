@@ -12,4 +12,6 @@ public interface WellnessCheckRepository extends JpaRepository<WellnessCheck, UU
 
     List<WellnessCheck> findAllByUserId(UUID userId);
 
+    void deleteByUserId(UUID userId);
+
 }
