@@ -1,6 +1,7 @@
 package com.feelreal.api.contoller;
 
 import com.feelreal.api.config.jwt.UserPrincipal;
+import com.feelreal.api.dto.event.EventCreateRequest;
 import com.feelreal.api.model.Article;
 import com.feelreal.api.service.ai.AISuggestionService;
 import com.feelreal.api.service.authentication.UserService;
@@ -23,8 +24,8 @@ public class AIController {
     }
 
     @GetMapping("/suggest")
-    public ResponseEntity<Article> suggestArticle(@AuthenticationPrincipal UserPrincipal user) {
-        Article result = aiSuggestionService.recommendPersonalizedActivity(user.getId());
+    public ResponseEntity<EventCreateRequest> suggestArticle(@AuthenticationPrincipal UserPrincipal user) {
+        EventCreateRequest result = aiSuggestionService.recommendPersonalizedEvent(user.getId());
 
         return ResponseEntity.ok().body(result);
     }

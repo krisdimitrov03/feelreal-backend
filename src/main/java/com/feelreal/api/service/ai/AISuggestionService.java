@@ -1,5 +1,6 @@
 package com.feelreal.api.service.ai;
 
+import com.feelreal.api.dto.event.EventCreateRequest;
 import com.feelreal.api.model.Article;
 import com.feelreal.api.model.User;
 
@@ -14,5 +15,7 @@ public interface AISuggestionService {
     String analyzeEmotion(String userText);
 
     String suggestBehaviorChange(String userActivityLog);
+
+    EventCreateRequest recommendPersonalizedEvent(UUID uuid);
 
 }
