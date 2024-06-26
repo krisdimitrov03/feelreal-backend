@@ -1,14 +1,17 @@
 package com.feelreal.api.config.db;
 
+import com.feelreal.api.dto.tip.TipCreateRequest;
 import com.feelreal.api.dto.article.ArticleCreateRequest;
 import com.feelreal.api.model.Article;
 import com.feelreal.api.model.Job;
+import com.feelreal.api.model.Tip;
 import com.feelreal.api.model.User;
-import com.feelreal.api.model.enumeration.ArticleType;
+import com.feelreal.api.model.enumeration.MoodType;
 import com.feelreal.api.model.enumeration.Intensity;
 import com.feelreal.api.model.enumeration.Role;
 import com.feelreal.api.repository.ArticleRepository;
 import com.feelreal.api.repository.JobRepository;
+import com.feelreal.api.repository.TipRepository;
 import com.feelreal.api.repository.UserRepository;
 import com.google.gson.Gson;
 import jakarta.transaction.Transactional;
@@ -17,8 +20,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -32,6 +33,7 @@ public class DatabaseSeeder implements CommandLineRunner {
     private final UserRepository userRepository;
     private final JobRepository jobRepository;
     private final ArticleRepository articleRepository;
+    private final TipRepository tipRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -39,12 +41,14 @@ public class DatabaseSeeder implements CommandLineRunner {
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             JobRepository jobRepository,
-            ArticleRepository articleRepository
+            ArticleRepository articleRepository,
+            TipRepository tipRepository
     ) {
         this.userRepository = userRepository;
         this.jobRepository = jobRepository;
         this.passwordEncoder = passwordEncoder;
         this.articleRepository = articleRepository;
+        this.tipRepository = tipRepository;
     }
 
     @Transactional
@@ -53,6 +57,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         List<Job> jobs = seedJobs();
         seedUsers(jobs);
         seedArticles();
+        seedTips();
     }
 
     private List<Job> seedJobs() {
@@ -100,7 +105,7 @@ public class DatabaseSeeder implements CommandLineRunner {
 
             List<Article> articles = Arrays.stream(gson.fromJson(json, ArticleCreateRequest[].class))
                     .map(a -> new Article(
-                            ArticleType.values()[a.getType()],
+                            MoodType.values()[a.getType()],
                             a.getTitle(),
                             a.getContent()
                     ))
@@ -112,4 +117,29 @@ public class DatabaseSeeder implements CommandLineRunner {
             System.out.println("Error reading articles.json file");
         }
     }
+
+    private void seedTips() {
+        if (tipRepository.count() > 0) {
+            return;
+        }
+
+        try {
+            String json = new String(Files.readAllBytes(Paths.get("src/main/resources/tips.json")));
+
+            Gson gson = new Gson();
+
+            List<Tip> tips = Arrays.stream(gson.fromJson(json, TipCreateRequest[].class))
+                    .map(a -> new Tip(
+                            MoodType.values()[a.getType()],
+                            a.getContent()
+                    ))
+                    .toList();
+
+            tipRepository.saveAll(tips);
+            tipRepository.flush();
+        } catch (IOException e) {
+            System.out.println("Error reading articles.json file");
+        }
+    }
+
 }

@@ -10,7 +10,7 @@ import com.feelreal.api.dto.wellnesschecks.WellnessCheckResponse;
 import com.feelreal.api.model.Article;
 import com.feelreal.api.model.Event;
 import com.feelreal.api.model.User;
-import com.feelreal.api.model.enumeration.ArticleType;
+import com.feelreal.api.model.enumeration.MoodType;
 import com.feelreal.api.service.article.ArticleService;
 import com.feelreal.api.service.authentication.UserService;
 import com.feelreal.api.service.wellnessChecks.WellnessCheckService;
@@ -67,7 +67,7 @@ public class AISuggestionServiceImpl implements AISuggestionService {
 
         String gptResponse = callGpt(recommendationMessage);
         int articleTypeInt = extractArticleTypeFromGptResponse(gptResponse);
-        ArticleType articleType = ArticleType.values()[articleTypeInt];
+        MoodType articleType = MoodType.values()[articleTypeInt];
 
         List<Article> articles = getArticlesByType(articleType);
         if (articles == null || articles.isEmpty()) {
@@ -138,7 +138,7 @@ Return one of the categories above. Start with your answer first, then explain i
 """, wellnessCheckArray.toString());
     }
 
-    private List<Article> getArticlesByType(ArticleType articleType) {
+    private List<Article> getArticlesByType(MoodType articleType) {
         OperationResult<List<Article>> result = articleService.getByType(articleType);
         if (result.getStatus() != ResultStatus.SUCCESS) {
             return null;
