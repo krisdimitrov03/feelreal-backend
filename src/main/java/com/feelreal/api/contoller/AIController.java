@@ -2,6 +2,7 @@ package com.feelreal.api.contoller;
 
 import com.feelreal.api.config.jwt.UserPrincipal;
 import com.feelreal.api.dto.common.OperationResult;
+import com.feelreal.api.dto.event.EventCreateRequest;
 import com.feelreal.api.model.Article;
 import com.feelreal.api.model.Tip;
 import com.feelreal.api.service.ai.AISuggestionService;
@@ -33,6 +34,13 @@ public class AIController {
     @GetMapping("/tips")
     public ResponseEntity<List<Tip>> suggestTips(@AuthenticationPrincipal UserPrincipal user) {
         OperationResult<List<Tip>> result = aiSuggestionService.recommendPersonalizedTips(user.getId());
+
+        return ResponseEntity.ok().body(result.getData());
+    }
+
+    @GetMapping("/event")
+    public ResponseEntity<EventCreateRequest> suggestEvent(@AuthenticationPrincipal UserPrincipal user) {
+        OperationResult<EventCreateRequest> result = aiSuggestionService.recommendPersonalizedEvent(user.getId());
 
         return ResponseEntity.ok().body(result.getData());
     }

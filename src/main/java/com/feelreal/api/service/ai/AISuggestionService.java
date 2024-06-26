@@ -1,6 +1,7 @@
 package com.feelreal.api.service.ai;
 
 import com.feelreal.api.dto.common.OperationResult;
+import com.feelreal.api.dto.event.EventCreateRequest;
 import com.feelreal.api.model.Article;
 import com.feelreal.api.model.Event;
 import com.feelreal.api.model.Tip;
@@ -12,7 +13,7 @@ public interface AISuggestionService {
 
     OperationResult<Article> recommendPersonalizedArticle(UUID userId);
 
-    OperationResult<Event> recommendPersonalizedEvent(UUID userId);
+    OperationResult<EventCreateRequest> recommendPersonalizedEvent(UUID userId);
 
     OperationResult<List<Tip>> recommendPersonalizedTips(UUID userId);
 
