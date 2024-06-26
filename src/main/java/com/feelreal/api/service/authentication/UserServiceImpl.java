@@ -5,9 +5,13 @@ import com.feelreal.api.dto.common.OperationResult;
 import com.feelreal.api.dto.common.ResultStatus;
 import com.feelreal.api.model.Job;
 import com.feelreal.api.model.User;
+import com.feelreal.api.model.WellnessCheck;
 import com.feelreal.api.model.enumeration.Role;
 import com.feelreal.api.repository.UserRepository;
+import com.feelreal.api.repository.WellnessCheckRepository;
 import com.feelreal.api.service.job.JobService;
+import com.feelreal.api.service.wellnessChecks.WellnessCheckService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -26,6 +30,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository repo;
     private final JwtService jwtService;
     private final JobService jobService;
+    private final WellnessCheckRepository wellnessCheckRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -33,13 +38,16 @@ public class UserServiceImpl implements UserService {
             UserRepository repo,
             JwtService jwtService,
             JobService jobService,
+            WellnessCheckRepository wellnessCheckRepository,
             PasswordEncoder passwordEncoder) {
         this.repo = repo;
         this.jwtService = jwtService;
         this.jobService = jobService;
+        this.wellnessCheckRepository = wellnessCheckRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Transactional
     @Override
     public RegisterResponse register(RegisterRequest data) {
         boolean userExists = repo
@@ -66,6 +74,7 @@ public class UserServiceImpl implements UserService {
         return new RegisterResponse(true, Collections.emptyList());
     }
 
+    @Transactional
     @Override
     public Optional<String> login(LoginRequest data) {
         Optional<User> userOpt = repo.findByUsername(data.getUsername());
@@ -89,11 +98,13 @@ public class UserServiceImpl implements UserService {
         return Optional.of(token);
     }
 
+    @Transactional
     @Override
     public Optional<User> getById(UUID id) {
         return repo.findById(id);
     }
 
+    @Transactional
     @Override
     public OperationResult<UserProfile> getProfile(UUID id, UUID principalId) {
         Optional<User> user = getById(id);
@@ -120,6 +131,7 @@ public class UserServiceImpl implements UserService {
         return new OperationResult<>(ResultStatus.SUCCESS, profile);
     }
 
+    @Transactional
     @Override
     public OperationResult<UpdateProfileResult> updateProfile(UUID id, UserUpdateRequest data, UUID principalId) {
         Optional<User> user = getById(id);
@@ -154,6 +166,7 @@ public class UserServiceImpl implements UserService {
         return new OperationResult<>(ResultStatus.SUCCESS, new UpdateProfileResult(updatedUser.getId(), token));
     }
 
+    @Transactional
     @Override
     public OperationResult<UUID> deleteProfile(UUID id, UUID principalId) {
         Optional<User> user = getById(id);
@@ -166,12 +179,16 @@ public class UserServiceImpl implements UserService {
             return new OperationResult<>(ResultStatus.NO_PERMISSION, null);
         }
 
+        wellnessCheckRepository.deleteByUserId(id);
+        wellnessCheckRepository.flush();
+
         repo.delete(user.get());
         repo.flush();
 
         return new OperationResult<>(ResultStatus.SUCCESS, user.get().getId());
     }
 
+    @Transactional
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return repo.findByUsername(username)

@@ -20,4 +20,6 @@ public interface TipService {
 
     OperationResult<Tip> getRandomByType(MoodType type);
 
+    OperationResult<List<Tip>> getRandomNByType(MoodType type, int n);
+
 }
