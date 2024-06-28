@@ -48,6 +48,20 @@ public class AISuggestionServiceImpl implements AISuggestionService {
             Return one of the categories above. Start with your answer first, then explain it.
             """;
 
+    private static final String EVENT_RECOMMENDATION_TEMPLATE = """
+            interface WellnessCheck {
+                date: Date;
+                type: "How are you feeling today out of ten" | "Compare to yesterday";
+                value: number; // 1 to 10 for "How are you feeling today" and "better than yesterday" or "worse than yesterday" for "Compare to yesterday"
+            };
+
+            These are user wellness checks:
+            %s
+
+            Based on the data from above, i want you to create a json object that has the following fields - title, notes, dateTimeStart, dateTimeEnd (both of which should be in the format yyyy-MM-dd HH:mm:ss) and repeatMode where repeatMode is 0 for once, 1 for daily, 2 for weekly, 3 for monthly, the default is 4.
+            The title should be short and tongue-in-cheek. The notes field should be no more than one sentence. Directly return the event itself, no fluff. And the event should be tailor-made for the specific user. The event should be some kind of social event such as a concert or something. You should be all means return a json object, nothing in front of the object and after it.
+            """;
+
     @Value("${gpt.api.key}")
     private String apiKey;
 
@@ -208,37 +222,11 @@ public class AISuggestionServiceImpl implements AISuggestionService {
     }
 
     private String createEventRecommendationMessages(JSONArray wellnessCheckArray) {
-        return String.format("""
-                interface WellnessCheck {
-                    date: Date;
-                    type: "How are you feeling today out of ten" | "Compare to yesterday";
-                    value: number; // 1 to 10 for "How are you feeling today" and "better than yesterday" or "worse than yesterday" for "Compare to yesterday"
-                };
-
-                These are user wellness checks:
-                %s
-
-                Based on the data from above, i want you to create a json object that has the following fields - title, notes, dateTimeStart, dateTimeEnd (both of which should be in the format yyyy-MM-dd HH:mm:ss) and repeatMode where repeatMode is 0 for once, 1 for daily, 2 for weekly, 3 for monthly, the default is 4.
-                The title should be short and tongue-in-cheek. The notes field should be no more than one sentence. Directly return the event itself, no fluff. And the event should be tailor-made for the specific user. The event should be some kind of social event such as a concert or something. You should be all means return a json object, nothing in front of the object and after it.
-                """, wellnessCheckArray.toString());
+        return String.format(EVENT_RECOMMENDATION_TEMPLATE, wellnessCheckArray.toString());
     }
 
     private String createRecommendationMessage(JSONArray wellnessCheckArray) {
-        return String.format("""
-                interface WellnessCheck {
-                    date: Date;
-                    type: "How are you feeling today out of ten" | "Compare to yesterday";
-                    value: number; // 1 to 10 for "How are you feeling today" and "better than yesterday" or "worse than yesterday" for "Compare to yesterday"
-                };
-
-                These are user wellness checks:
-                %s
-
-                Suggest the category for the mood of the user based on the wellness checks. The categories are:
-                "constant_happiness", "constant_sadness", "was_happy_now_sad", "was_sad_now_happy".
-
-                Return one of the categories above. Start with your answer first, then explain it.
-                """, wellnessCheckArray.toString());
+        return String.format(ARTICLE_TYPE_RECOMMENDATION_TEMPLATE, wellnessCheckArray.toString());
     }
 
     private List<Article> getArticlesByType(MoodType articleType) {
@@ -257,7 +245,6 @@ public class AISuggestionServiceImpl implements AISuggestionService {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-        // Clean the input string if it starts with a non-JSON structure
         String cleanedResponse = cleanInputString(gptResponse);
 
         try {
@@ -277,7 +264,6 @@ public class AISuggestionServiceImpl implements AISuggestionService {
     }
 
     private String cleanInputString(String input) {
-        // Check if the input starts with the JSON object
         int jsonStartIndex = input.indexOf("{");
         if (jsonStartIndex != -1) {
             return input.substring(jsonStartIndex);
@@ -289,10 +275,8 @@ public class AISuggestionServiceImpl implements AISuggestionService {
         JsonNode rootNode = objectMapper.readTree(jsonString);
 
         if (rootNode.has("title") && rootNode.has("notes") && rootNode.has("dateTimeStart") && rootNode.has("dateTimeEnd") && rootNode.has("repeatMode")) {
-            // JSON is in expected format
             return objectMapper.treeToValue(rootNode, Event.class);
         } else {
-            // Handle other formats or throw an exception
             throw new IllegalArgumentException("Invalid JSON format");
         }
     }
