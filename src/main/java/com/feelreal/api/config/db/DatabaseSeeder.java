@@ -99,7 +99,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         }
 
         try {
-            String json = new String(Files.readAllBytes(Paths.get("src/main/resources/articles.json")));
+            String json = new String(Files.readAllBytes(Paths.get("/app/articles.json")));
 
             Gson gson = new Gson();
 
@@ -124,7 +124,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         }
 
         try {
-            String json = new String(Files.readAllBytes(Paths.get("src/main/resources/tips.json")));
+            String json = new String(Files.readAllBytes(Paths.get("/app/tips.json")));
 
             Gson gson = new Gson();
 
